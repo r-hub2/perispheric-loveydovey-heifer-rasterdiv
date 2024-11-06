@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Matteo Marcantonio" />
+
+<meta name="date" content="2024-11-06" />
+
+<title>Area-based Rao’s index.</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Area-based Rao’s index.</h1>
+<h4 class="author">Matteo Marcantonio</h4>
+<h4 class="date">2024-11-06</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">require</span>(rasterdiv)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">require</span>(terra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">require</span>(rasterVis)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">require</span>(RColorBrewer)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">require</span>(viridis)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">require</span>(latticeExtra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">require</span>(ggplot2)</span></code></pre></div>
+<p>This vignette uses <strong>rasterdiv</strong> to derive classic and multidimension area-based Rao’s index from an input vector layer and multiple raster layers.</p>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>A SpatRaster called copNDVI is loaded together with the package <strong>rasterdiv</strong>. <em>copNDVI</em> is a 8-bit raster, meaning that pixel values range from 0 to 255. You could <em>stretch</em> it to match a more familiar (-1,1) values range using <code>terra::stretch(copNDVI,minv=-1,maxv=1)</code>. The original dataset was resampled to 1/10th of its spatial resolution and pixels with values 253, 254 and 255 (water) were set as NA’s.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>copNDVI &lt;-<span class="st"> </span><span class="kw">load_copNDVI</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>copNDVIlr &lt;-<span class="st"> </span>terra<span class="op">::</span><span class="kw">aggregate</span>(copNDVI, <span class="dt">fact=</span><span class="dv">10</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">values</span>(copNDVIlr) &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">values</span>(copNDVIlr))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>world &lt;-<span class="st"> </span><span class="kw">load_world</span>()</span></code></pre></div>
+</div>
+<div id="compute-area-based-raos-index" class="section level2">
+<h2>Compute Area based Rao’s Index</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>RaoC &lt;-<span class="st"> </span><span class="kw">paRao</span>(<span class="dt">x=</span>copNDVIlr, <span class="dt">area=</span>world, <span class="dt">field=</span><span class="st">&#39;CONTINENT&#39;</span>, <span class="dt">alpha=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">#Plot classic area-based Rao&#39;s index</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">plot</span>(RaoC, <span class="dt">col=</span><span class="kw">hcl</span>(RaoC<span class="op">$</span>alpha<span class="fl">.1</span><span class="op">*</span><span class="dv">10</span>), <span class="dt">main=</span><span class="st">&quot;Classic Rao&#39;s index per continent alpha 1&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">text</span>(RaoC, <span class="dt">label=</span><span class="kw">paste</span>(<span class="st">&quot;Rao&#39;Q =&quot;</span>, <span class="kw">round</span>(RaoC<span class="op">$</span>alpha<span class="fl">.1</span>,<span class="dv">1</span>)), <span class="dt">col=</span><span class="st">&quot;black&quot;</span>, <span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">halo=</span><span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="compute-multidimension-area-based-raos-index" class="section level2">
+<h2>Compute multidimension area-based Rao’s Index</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># Adding a second &quot;noise&quot; SpatRaster layer</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="co"># copNDVIlr &lt;- terra::aggregate(copNDVI, fact=20)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="kw">values</span>(copNDVIlr) &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">values</span>(copNDVIlr))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>noise =<span class="st"> </span><span class="kw">rast</span>(copNDVIlr)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>noise[] =<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">runif</span>(<span class="dt">n=</span><span class="kw">ncell</span>(noise),<span class="dt">min=</span><span class="dv">1</span>, <span class="dt">max=</span><span class="dv">10</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>RaoMC &lt;-<span class="st"> </span><span class="kw">paRao</span>(<span class="dt">x=</span><span class="kw">c</span>(copNDVIlr,noise), <span class="dt">area=</span>world, <span class="dt">field=</span><span class="st">&#39;CONTINENT&#39;</span>, <span class="dt">alpha=</span><span class="dv">2</span>, <span class="dt">method=</span><span class="st">&quot;multidimension&quot;</span>, <span class="dt">simplify=</span><span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">#Plot area-based Rao&#39;s index</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">plot</span>(RaoMC, <span class="dt">col=</span><span class="kw">hcl</span>(RaoMC<span class="op">$</span>alpha<span class="fl">.2</span><span class="op">*</span><span class="dv">10000</span>), <span class="dt">main=</span><span class="st">&quot;Multidimension Rao&#39;s index per continent alpha 10&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">text</span>(RaoMC, <span class="dt">label=</span><span class="kw">paste</span>(<span class="st">&quot;Rao&#39;Q =&quot;</span>, <span class="kw">round</span>(RaoMC<span class="op">$</span>alpha<span class="fl">.2</span>,<span class="dv">3</span>)), <span class="dt">col=</span><span class="st">&quot;black&quot;</span>, <span class="dt">family=</span><span class="st">&quot;Arial&quot;</span>, <span class="dt">halo=</span><span class="ot">TRUE</span>)</span></code></pre></div>
+</div>
+<div id="additional-example-subsetting-on-a-continent-and-then-using-a-grid-vector-to-derive-raos-in-each-cell" class="section level2">
+<h2>Additional example subsetting on a continent and then using a grid vector to derive Rao’s in each cell</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">#Subset</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>africa &lt;-<span class="st"> </span><span class="kw">subset</span>(world, world<span class="op">$</span>CONTINENT<span class="op">==</span><span class="st">&quot;Africa&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="co">#Make the raster grid</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>africa.r &lt;-<span class="st"> </span><span class="kw">rast</span>(<span class="kw">ext</span>(africa), <span class="dt">nrow=</span><span class="dv">20</span>, <span class="dt">ncol=</span><span class="dv">20</span>, <span class="dt">crs =</span> <span class="st">&quot;+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>africa.r[] &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="kw">ncell</span>(africa.r)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">#Vectorise the SpatRaster</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>africa.v =<span class="st"> </span><span class="kw">as.polygons</span>(africa.r)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co">#Derive Rao&#39;s (alpha=2) for each grid cell</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>RaoGRID &lt;-<span class="st"> </span><span class="kw">paRao</span>(<span class="dt">x=</span>copNDVIlr, <span class="dt">area=</span>africa.v, <span class="dt">field=</span><span class="st">&#39;lyr.1&#39;</span>, <span class="dt">alpha=</span><span class="dv">2</span>, <span class="dt">simplify=</span><span class="dv">0</span>, <span class="dt">na.tolerance=</span><span class="fl">0.2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">#Transform the spatial polygon data frame in a raster layer that can be used in levelplot</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>rr &lt;-<span class="st"> </span><span class="kw">rast</span>(RaoGRID, <span class="dt">ncol=</span><span class="dv">20</span>, <span class="dt">nrow=</span><span class="dv">20</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="kw">values</span>(rr) &lt;-<span class="st"> </span>RaoGRID<span class="op">$</span>alpha<span class="fl">.2</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co">#Plot Rao&#39;s per grid cell</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">ggplot</span>() <span class="op">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_raster</span>(<span class="dt">data =</span> <span class="kw">as.data.frame</span>(rr, <span class="dt">xy=</span><span class="ot">TRUE</span>), <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">fill =</span> lyr<span class="fl">.1</span>)) <span class="op">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_viridis</span>(<span class="dt">option =</span> <span class="st">&quot;D&quot;</span>, <span class="dt">direction =</span> <span class="dv">1</span>) <span class="op">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="st">   </span><span class="kw">geom_polygon</span>(<span class="dt">data =</span> <span class="kw">fortify</span>(<span class="kw">as</span>(africa.v, <span class="st">&quot;Spatial&quot;</span>)), <span class="kw">aes</span>(<span class="dt">x =</span> long, <span class="dt">y =</span> lat, <span class="dt">group =</span> group), <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">color =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">linewidth=</span><span class="fl">0.3</span>) <span class="op">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_polygon</span>(<span class="dt">data =</span> <span class="kw">fortify</span>(<span class="kw">as</span>(world, <span class="st">&quot;Spatial&quot;</span>)), <span class="kw">aes</span>(<span class="dt">x =</span> long, <span class="dt">y =</span> lat, <span class="dt">group =</span> group), <span class="dt">fill =</span> <span class="ot">NA</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, , <span class="dt">linewidth=</span><span class="fl">0.5</span>) <span class="op">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>, <span class="dt">aspect.ratio =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
